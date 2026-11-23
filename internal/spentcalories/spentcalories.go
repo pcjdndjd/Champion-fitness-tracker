@@ -27,10 +27,17 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 	if err != nil {
 		return 0, "", 0, err
 	}
+	if steps <= 0 {
+		return 0, "", 0, errors.New("количество шагов должно быть больше нуля")
+	}
 	trainingType := splittedData[1]
+
 	duration, err := time.ParseDuration(splittedData[2])
 	if err != nil {
 		return 0, "", 0, err
+	}
+	if duration <= 0 {
+		return 0, "", 0, errors.New("длительность тренировки должна быть больше нуля")
 	}
 	return steps, trainingType, duration, nil
 }
@@ -58,7 +65,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		return "", err
 	}
 	distance := distance(steps, height)
-	meanSpeed := meanSpeed(steps, weight, duration)
+	meanSpeed := meanSpeed(steps, height, duration)
 	var calories float64
 	switch trainingType {
 	case "Бег":
@@ -79,7 +86,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	trainingInfo := fmt.Sprintf(
 		"Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n",
 		trainingType,
-		duration,
+		duration.Hours(),
 		distance,
 		meanSpeed,
 		calories,
